@@ -9,7 +9,7 @@ Created on Wed May 16 08:20:34 2018
 from PIL import Image
 import os
 
-def unpack(fpath, x=4, y=2, output_dir='unpack_output'):
+def unpack(fpath, x=4, y=2, output_dir='unpack_output', png=True):
     # example.png
     # -> unpack('example.png',x=2,y=2) ->
     # unpack_output/example-0-0.png
@@ -28,12 +28,15 @@ def unpack(fpath, x=4, y=2, output_dir='unpack_output'):
             box = (i*x_length, j*y_length, (i+1)*x_length, (j+1)*y_length)
             sim = im.crop(box)
             name,ext = os.path.splitext(os.path.basename(fpath))
-            output_name = f'{name}-{i}-{j}{ext}'
+            if png:
+                output_name = f'{name}-{i}-{j}.png'
+            else:
+                output_name = f'{name}-{i}-{j}{ext}'
             sim.save(os.path.join(output_dir, output_name))
     
 
 
-def pack(dir_path,output_dir='pack_output'):
+def pack(dir_path,output_dir='pack_output',png=True):
     # This script will recognize "*-0-0.png" files and auto merge them.
     # dir_path/example-0-0.png
     # dir_path/example-0-1.png
@@ -64,24 +67,11 @@ def pack(dir_path,output_dir='pack_output'):
             im = Image.open(fpath)
             box = (i*x_length, j*y_length, (i+1)*x_length, (j+1)*y_length)
             output_image.paste(im,box=box)
-    output_image.save(os.path.join(output_dir,f'{name}{ext}'))
-    
-if __name__ == '__main__':
-    import argparse
-    parser = argparse.ArgumentParser(description='RPG maker mv pack & unpack tool')
-    parser.add_argument('command', help='pack or unpack')
-    parser.add_argument('path', help="sub images directory for pack or single image path for unpack")
-    parser.add_argument('-o','--output', help='output that store results of pack or unpack',default='output')
-    parser.add_argument('-x','--x', help='unpack arg', type=int, default=4)
-    parser.add_argument('-y','--y', help='unpack arg', type=int, default=2)
-    args = parser.parse_args()
-    
-    if args.command == 'unpack':
-        unpack(args.path, x=args.x, y=args.y, output_dir = args.output)
-    elif args.command == 'pack':
-        pack(args.path, output_dir=args.output)
+    if png:
+        output_image.save(os.path.join(output_dir,f'{name}.png'))
     else:
-        print(f"Unrecognized command {args.command}")
+        output_image.save(os.path.join(output_dir,f'{name}{ext}'))
+    
 
 
     
