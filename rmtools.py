@@ -27,9 +27,9 @@ def batch_process_path(transform, path, output_dir, ext=None, flatten=False):
     os.makedirs(output_root, exist_ok=True)
     im.save(os.path.join(output_root, output_name))
     
-def batch_process_paths(*args, **kwargs):
+def batch_process_paths(transform, paths, *args, **kwargs):
     for path in paths:
-        batch_process_path(*args, **kwargs)
+        batch_process_path(transform, path, *args, **kwargs)
         
 def batch_process(_transform, args):
     kwargs = {}
@@ -37,8 +37,11 @@ def batch_process(_transform, args):
     # process color
     if args.color is not None:
         kwargs['color'] = tuple(args.color)
-    
-    transform = lambda im:_transform(im, **kwargs)
+        
+    if args.mode is None:
+        transform = lambda im:_transform(im, **kwargs)
+    else:
+        transform = lambda im:_transform(im.convert(args.mode), **kwargs)
     batch_process_paths(transform, args.path, output_dir = args.output, 
                         ext='.png' if args.png else None, flatten = args.flatten)  
 
@@ -56,6 +59,7 @@ parser.add_argument('-c','--color',default=None,type=int,nargs='+',help='specifi
 parser.add_argument('-d','--directory',action='store_const',const=True, default=False, help="See path as directory and expand it.")
 parser.add_argument('-f','--flatten',action='store_const',const=True,default=False,help='output all file in top output directory.(Maybe raise same name error)')
 parser.add_argument('-s','--second',help="Seconds to be contributed to The Elder.")
+parser.add_argument('-m','--mode',help="Image will be converted to the mode(i.e. 'RGB','RGBA') before process")
 args = parser.parse_args()
 
 if args.directory:

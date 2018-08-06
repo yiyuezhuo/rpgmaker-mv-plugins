@@ -9,7 +9,7 @@ Created on Wed May 16 08:20:34 2018
 from PIL import Image
 import os
 
-def unpack(fpath, x=4, y=2, output_dir='unpack_output', png=True):
+def unpack(fpath, x=4, y=2, output_dir='unpack_output', png=True, border=0, x_length=None, y_length=None, verbose=False):
     # example.png
     # -> unpack('example.png',x=2,y=2) ->
     # unpack_output/example-0-0.png
@@ -21,11 +21,19 @@ def unpack(fpath, x=4, y=2, output_dir='unpack_output', png=True):
     
     im = Image.open(fpath)
     xx,yy = im.size
-    x_length = xx//x
-    y_length = yy//y
+    if x_length is None:
+        x_length = (xx - (x-1)*border)//x
+    if y_length is None:
+        y_length = (yy - (y-1)*border)//y
+    resx = (xx - ((x-1)*border)) %x
+    resy = (yy - ((y-1)*border)) %y
+    if verbose:
+        print(f'{xx}x{yy} sheet -> {x}x{y} grid consisting {x_length}x{y_length}. res:{resx} x {resy}')
+    if resx != 0 or resy != 0:
+        print(f"{xx}x{yy} image seems can't be split correctly into a {x}x{y} grid, maybe require border or other setting?")
     for i in range(x):
         for j in range(y):
-            box = (i*x_length, j*y_length, (i+1)*x_length, (j+1)*y_length)
+            box = (i*x_length + border*i, j*y_length + border*j, (i+1)*x_length + border*i, (j+1)*y_length + border * j)
             sim = im.crop(box)
             name,ext = os.path.splitext(os.path.basename(fpath))
             if png:

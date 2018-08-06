@@ -27,6 +27,28 @@ def convert_color_to_alpha(im, color=(0,0,0,255)):
     for xy in xy_list:
         im.putpixel(xy,(0,0,0,0))
     return im
+    
+def convert_color_to_alpha_tol(im, color=(255,255,255),tol=10.0):
+    #x,y = im.size
+    ij_list = []
+    
+    array_im = np.array(im)
+    arr = (np.abs(array_im[:,:,:3] - np.array(color))).astype(float).sum(-1)
+    
+    for i in range(arr.shape[0]):
+        for j in range(arr.shape[1]):
+            if arr[i,j] > tol:
+                continue
+            if i >0 and i < arr.shape[0]-1 and j>0 and j <arr.shape[1]-1:
+                if arr[i-1,j] > tol or arr[i+1,j] > tol or \
+                    arr[i,j-1] > tol or arr[i,j+1] > tol:
+                        continue
+            #im.putpixel((i,j),(0,0,0,0))
+            ij_list.append((i,j))
+    for i,j in ij_list:
+        array_im[i,j] = (255,255,255,0)
+        #im.putpixel(xy,(255,255,255,0))
+    return Image.fromarray(array_im,mode='RGBA')
 
 def convert_mask_to_alpha(im, mask, inverse=True):
     #import numpy as np
