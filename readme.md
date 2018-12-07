@@ -31,6 +31,10 @@ unpack:
 
 `$ python rmtools.py unpack Actor2.png -x 4 -y 2 -o output`
 
+batch unpack:
+
+`$ python rmtools.py input_dir -d -o output_dir -x 12 -y 8`
+
 pack:
 
 `$ python rmtools.py pack output -o output2`
