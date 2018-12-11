@@ -33,7 +33,7 @@ unpack:
 
 batch unpack:
 
-`$ python rmtools.py input_dir -d -o output_dir -x 12 -y 8`
+`$ python rmtools.py unpack input_dir -d -o output_dir -x 12 -y 8`
 
 pack:
 
